@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/AppContext";
 import { LoadingModal } from "@/components/ui/loading-modal"
 import { Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ToastContainer } from "@/components/ui/toast"
+// import env from "@/config/env";
 
 interface LoginFormProps extends React.ComponentProps<"form"> {
   onSwitchToSignup?: () => void;
@@ -23,6 +24,8 @@ export function LoginForm({ className, onSwitchToSignup, ...props }: LoginFormPr
     email: "",
     password: "",
   });
+
+  console.log(import.meta.env)
 
   const handleInputChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -74,8 +77,9 @@ export function LoginForm({ className, onSwitchToSignup, ...props }: LoginFormPr
     setIsLoading(true);
     try {
       const result = await signInWithGoogle();
+      console.log(result)
       if (result.success) {
-        toast.success("Welcome!", "You have been successfully signed in with Google.")
+        toast.success("Welcome!", "You are being redirected...")
       } else {
         toast.error("Google Sign In Failed", result.error || "Failed to sign in with Google.")
       }

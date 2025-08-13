@@ -19,7 +19,7 @@ import {
   Menu,
   X
 } from "lucide-react";
-import { useAuth } from "./contexts/AuthContext";
+import { useAuth } from "./contexts/AppContext";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("Full Statistics");
