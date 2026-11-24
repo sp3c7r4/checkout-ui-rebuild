@@ -217,6 +217,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               data.spreadsheet && updateSpreadsheet(data.spreadsheet);
             }
           }
+          // a buyer redirected from AWS Marketplace has identifiers parked server-side
+          const claimed = await server.claimMarketplace();
+          if (claimed?.data) {
+            Toast("AWS Marketplace subscription linked", false);
+          } else if (/expired/i.test(claimed?.message ?? "")) {
+            Toast("Your AWS Marketplace setup link expired — repeat setup from AWS Marketplace", true);
+          }
         }
         setLoading(false);
       })

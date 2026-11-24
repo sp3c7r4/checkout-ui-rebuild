@@ -88,6 +88,26 @@ class Server {
     }
   }
 
+  /** Attach a parked AWS Marketplace subscription once the buyer has a session. */
+  async claimMarketplace() {
+    try {
+      const res = await api({ method: "post", url: "/marketplace/claim" });
+      return {
+        code: res.data.statusCode,
+        status: res.data.httpStatus,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (e: any) {
+      return {
+        code: e.response?.data?.statusCode,
+        status: e.response?.data?.httpStatus,
+        message: e.response?.data?.message ?? "Could not link AWS Marketplace subscription",
+        data: null,
+      };
+    }
+  }
+
   async getBusiness() {
     try {
       const res = await api({ method: "get", url: "/admin/business" });
