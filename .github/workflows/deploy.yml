@@ -28,8 +28,8 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           script: |
             set -e
-            cd /srv/checkout
-            git -C frontend fetch --all && git -C frontend reset --hard origin/main
+            cd /srv/checkout/backend
+            git -C ../frontend fetch --all && git -C ../frontend reset --hard origin/main
             docker compose build web
             docker compose up -d web
             docker compose ps
