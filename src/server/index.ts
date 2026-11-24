@@ -88,6 +88,25 @@ class Server {
     }
   }
 
+  async getBusiness() {
+    try {
+      const res = await api({ method: "get", url: "/admin/business" });
+      return {
+        code: res.data.statusCode,
+        status: res.data.httpStatus,
+        message: res.data.message,
+        data: res.data.data,
+      };
+    } catch (e: any) {
+      return {
+        code: e.response?.data?.statusCode,
+        status: e.response?.data?.httpStatus,
+        message: e.response?.data?.message,
+        data: null,
+      };
+    }
+  }
+
   async getProducts(business_id: string) {
     try {
       const res = await api({

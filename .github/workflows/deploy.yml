@@ -1,0 +1,35 @@
+name: Deploy web
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-frontend
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      HOST: ${{ secrets.EC2_HOST }}
+    steps:
+      - name: Skip when no host is configured
+        if: env.HOST == ''
+        run: echo "EC2_HOST secret not set - skipping deploy"
+
+      - name: Deploy over SSH
+        if: env.HOST != ''
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          script: |
+            set -e
+            cd /srv/checkout
+            git -C frontend fetch --all && git -C frontend reset --hard origin/main
+            docker compose build web
+            docker compose up -d web
+            docker compose ps

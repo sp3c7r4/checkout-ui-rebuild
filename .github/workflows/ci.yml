@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+        env:
+          VITE_SERVER_ORIGIN: https://api.example.com/api/v1
+          VITE_API_ORIGIN: https://api.example.com
+          VITE_TELEGRAM_BOT_URL: https://t.me/example_bot

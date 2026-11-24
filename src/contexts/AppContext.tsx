@@ -5,6 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastContainer } from "@/components/ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { Toast } from "@/utils/Toast";
+import server from "@/server";
 
 // Theme types
 type Theme = "dark" | "light" | "system";
@@ -204,10 +205,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     authClient
       .getSession()
-      .then((session) => {
+      .then(async (session) => {
         console.log("Session check result:", session);
         if (session?.data) {
           updateUser(session.data.user as any);
+          if ((session.data.user as any)?.business_id) {
+            const { data } = await server.getBusiness();
+            if (data?.id) {
+              updateBusiness(data);
+              data.settings && updateSettings(data.settings);
+              data.spreadsheet && updateSpreadsheet(data.spreadsheet);
+            }
+          }
         }
         setLoading(false);
       })
@@ -225,8 +234,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         callbackURL: `${window.location.origin}/dashboard`,
       });
       
-      if (result?.data?.user) {
-        updateUser(result.data.user);
+      const signedInUser = (result?.data as { user?: unknown } | undefined)?.user;
+      if (signedInUser) {
+        updateUser(signedInUser);
       }
       
       return { success: true };

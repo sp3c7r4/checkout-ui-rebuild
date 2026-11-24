@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react";
 import { useAuth } from "@/contexts/AppContext";
+import { googleAuthEnabled } from "@/lib/auth-client";
 import { LoadingModal } from "@/components/ui/loading-modal"
 import { Eye, EyeOff } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
@@ -159,11 +160,14 @@ export function LoginForm({ className, onSwitchToSignup, ...props }: LoginFormPr
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? "Signing in..." : "Login"}
           </Button>
-          <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-            <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or continue with
-            </span>
-          </div>
+          {googleAuthEnabled && (
+            <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+              <span className="bg-background text-muted-foreground relative z-10 px-2">
+                Or continue with
+              </span>
+            </div>
+          )}
+          {googleAuthEnabled && (
           <Button onClick={handleGoogleLogin} variant="outline" className="w-full" type="button" disabled={isLoading}>
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -173,6 +177,7 @@ export function LoginForm({ className, onSwitchToSignup, ...props }: LoginFormPr
             </svg>
             {isLoading ? "Please wait..." : "Login with Google"}
           </Button>
+        )}
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}

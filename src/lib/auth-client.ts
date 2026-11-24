@@ -1,7 +1,10 @@
 import { createAuthClient } from "better-auth/client";
+import env from "@/config/env";
+
+export const googleAuthEnabled = env.VITE_GOOGLE_AUTH === "true";
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:3000", // Your Hono server URL
+  baseURL: env.VITE_API_ORIGIN,
   plugins: [],
 });
 
