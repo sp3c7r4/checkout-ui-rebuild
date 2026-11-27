@@ -89,9 +89,9 @@ class Server {
   }
 
   /** Attach a parked AWS Marketplace subscription once the buyer has a session. */
-  async claimMarketplace() {
+  async claimMarketplace(pending?: string) {
     try {
-      const res = await api({ method: "post", url: "/marketplace/claim" });
+      const res = await api({ method: "post", url: "/marketplace/claim", data: { pending } });
       return {
         code: res.data.statusCode,
         status: res.data.httpStatus,

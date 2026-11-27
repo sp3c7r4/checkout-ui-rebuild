@@ -62,6 +62,29 @@ interface AppActions {
 
 type AppContextType = AppState & AppActions;
 
+/**
+ * Strip `#mp=<id>` from the URL and keep the id for this tab, so it survives a
+ * detour through the sign-in page and is claimed once a session exists.
+ */
+const PENDING_KEY = "mp_pending";
+
+function takePendingHash(): string | undefined {
+  let id: string | undefined;
+  if (typeof window !== "undefined") {
+    const match = window.location.hash.match(/(?:^#|&)mp=([^&]+)/);
+    if (match) {
+      id = decodeURIComponent(match[1]);
+      window.sessionStorage.setItem(PENDING_KEY, id);
+      const { pathname, search } = window.location;
+      window.history.replaceState(null, "", pathname + search);
+    } else {
+      id = window.sessionStorage.getItem(PENDING_KEY) ?? undefined;
+    }
+    if (id) window.sessionStorage.removeItem(PENDING_KEY);
+  }
+  return id;
+}
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 // Persistence utilities
@@ -217,12 +240,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               data.spreadsheet && updateSpreadsheet(data.spreadsheet);
             }
           }
-          // a buyer redirected from AWS Marketplace has identifiers parked server-side
-          const claimed = await server.claimMarketplace();
-          if (claimed?.data) {
-            Toast("AWS Marketplace subscription linked", false);
-          } else if (/expired/i.test(claimed?.message ?? "")) {
-            Toast("Your AWS Marketplace setup link expired — repeat setup from AWS Marketplace", true);
+          // a buyer redirected from AWS Marketplace carries the pending id in the fragment
+          const pending = takePendingHash();
+          if (pending) {
+            const claimed = await server.claimMarketplace(pending);
+            if (claimed?.data) {
+              Toast("AWS Marketplace subscription linked", false);
+            } else if (/expired/i.test(claimed?.message ?? "")) {
+              Toast("Your AWS Marketplace setup link expired — repeat setup from AWS Marketplace", true);
+            }
           }
         }
         setLoading(false);
